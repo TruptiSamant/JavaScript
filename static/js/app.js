@@ -5,25 +5,43 @@ var table = d3.select('#ufo-table');
 
 // var columns = ["datetime", "city", "state", "country", "shape", "comment"]
 var columns = d3.keys(data[0])
-
-
-///Function build header according to data
-function buildheader() {
+/**
+* buildheader.
+*
+* Description. Build the header
+*
+* @return {type} none.
+*/
+var once = function buildheader() {
     //Append table head
-    var thead = table.append('thead')
+        var thead = table.append('thead')
 
-    // append the header row
-    table.select("thead").append('tr')
-      .selectAll('th')
-      .data(columns).enter()
-      .append('th')
-      .text(function (column) { return column; });
+        // append the header row
+        table.select("thead").append('tr')
+          .selectAll('th')
+          .data(columns).enter()
+          .append('th')
+          .text(function (column) { return column; });
+      }
 
-}
-
-///funtion:  Build table
-///Builds table dynamically
+/**
+* buildTable.
+*
+* Description. Build table according to selection
+*
+* @tableData {type}   var  list of data.
+*
+* @return {type} none.
+*/
 function buildTable(tableData){
+
+    //Build the header one time
+    if (!once.done) {
+        once();
+        once.done = true;
+        console.log("doing this once")
+    }
+
     console.log(tableData)
     table.select('tbody').remove()
     var	tbody = table.append('tbody');
@@ -45,39 +63,86 @@ function buildTable(tableData){
 		  .text(function (d) { return d.value; });
 }
 
-// Display the table header and data
-buildheader()
-buildTable(data)
-
-//Button click
-//Filter value based on input datetime
-submit = d3.select('#filter-btn')
-
-submit.on("click", function(){
+/**
+ * Button click: Handle button clieck event.
+ *
+ * Description.
+ *
+ * @return {type} none.
+ */
+d3.select('#filter-btn')
+   .on("click", function(){
     // Prevent the page from refreshing
-    d3.event.preventDefault();
-    //get input
-    var inputvalue = d3.select("#datetime")
-    //Get input
-    var value = inputvalue.property("value")
+        d3.event.preventDefault();
+        //get input
+        var value = d3.select("#input-value")
+                      .property("value")
+        console.log("Value " + value)
+        var selection = d3.select('#Drop-down')
+                          .property('value')
 
+        filterData(selection, value);
+})
+
+/**
+ * DropDown Select.
+ *
+ * Description.
+ *
+ * @return {type} none.
+ */
+d3.select('#Drop-down')
+  .on('change', function() {
+    var selection = d3.select(this).property('value');
+
+    d3.select("#input-value")
+        .property("value", "")
+        .property("placeholder", function(){
+            if (selection == 'datetime')
+                return "1/11/2011";
+            else
+                return selection;
+        })
+});
+
+
+/**
+ * Filters the data.
+ *
+ * Description.
+ *
+  * @selection {type}   var          Selection on Drop Down.
+ * @value {type}   [var]        User Entered value.
+ *
+ * @return {type} none.
+ */
+function filterData(selection, value){
     //Validate input
     var dateFormat = "D/M/YYYY";
-    if (moment(value, "D/M/YYYY", true).isValid() || moment(value, "D/MM/YYYY", true).isValid()) {
-        console.log("Date is valid")
-        d3.select("#error").text("")
+    var newdata = data
+    console.log("filterdata: " + selection + " Value " + value)
+    if (selection == 'datetime'){
+        //validate the date
+        if (!(moment(value, "D/M/YYYY", true).isValid() || moment(value, "D/MM/YYYY", true).isValid())) {
+            d3.select("#error").text("Date is NOT valid");
+            d3.select("#input-value")
+                .property("value", "")
+                .property("placeholder", "1/11/2011");
+            //If invalid data show all
+            buildTable(data)
+            return;
+        }
+    }
 
-        //Filter the data
-        var newdata = data.filter(function(d){
-            return d.datetime == value
-        })
-        buildTable(newdata)
-    } else {
-        console.log("Date is NOT valid")
-        d3.select("#error").text("Date is NOT valid")
-        inputvalue.property("value", "")
-        inputvalue.property("placeholder", "1/11/2011")
-        //If invalid data show all
-        buildTable(data)
-    } ; // return true
-})
+    //Filter the data
+    //Filter the data
+    var newdata = data.filter(function(d){
+        if (value === "") return data;
+        return d[selection].toLowerCase() == value.toLowerCase()
+    })
+    buildTable(newdata)
+}
+
+// Display the table header and data
+// buildheader()
+buildTable(data)

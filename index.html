@@ -27,21 +27,28 @@
     </div>
     <div class="row margin-top-50">
         <div class="">
-            <div class="col-md-2 float-left"></div>
+            <div class="col-md-2 float-left" ></div>
             <p id = "error" style="color: red;"></p>
         </div>
-      <div class="row margin-top-50">
-        <div class="col-md-2">
+      <div class="row margin-top-50 margin-right-150">
+        <div class="col-md-2" style="padding-left: 40px;">
           <aside class="filters">
             <div class="panel panel-default">
               <div class="panel-heading">Filter Search</div>
               <div class="panel-body">
                 <form>
                   <div class="form-group">
+                      <select class="bootstrap-select" id="Drop-down">
+                          <option value="datetime" selected="selected">datetime</option>
+                          <option value="city">City</option>
+                          <option value="state">State</option>
+                          <option value="country">Country</option>
+                          <option value="shape">Shape</option>
+                      </select>
                     <ul class="list-group" id="filters">
                       <li class="filter list-group-item">
                         <label for="date">Enter a Date</label>
-                        <input class="form-control" id="datetime" type="text" placeholder="1/11/2011">
+                        <input class="form-control" id="input-value" type="text" placeholder="1/11/2011">
                       </li>
                     </ul>
                   </div>
